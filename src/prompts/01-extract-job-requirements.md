@@ -34,5 +34,3 @@ Use sequential IDs within each list. Use an empty array when there are no requir
 JOB DESCRIPTION:
 {{JOB_DESCRIPTION}}
 ```
-
-Save the model's JSON response as `build/ollama/requirements/YYYY-MM-DD_<job-company>_<job-title>.json`, where the date is today's date in `YYYY-MM-DD` format. Make the company and title portions filename-safe lowercase hyphenated slugs, using `unknown-company` if the company is not stated. Keep the response itself strict JSON without adding a filename or wrapper to its contents.
