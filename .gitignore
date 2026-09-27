@@ -1,3 +1,6 @@
 build/
 debug.log
 **/__pycache__
+*.pdf
+/*.tex
+Job_Description.txt

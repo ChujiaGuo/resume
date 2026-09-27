@@ -12,7 +12,7 @@
 
 ## Frameworks
 
-- React
+- React.js
 - Node.js
 - Flask
 - JUnit

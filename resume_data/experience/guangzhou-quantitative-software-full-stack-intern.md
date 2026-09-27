@@ -1,5 +1,5 @@
 ---
-id: guangzhou-quantitative-software-full-stack-intern
+id: guangzhou-quantitative-software
 company: "Guangzhou Quantitative Software Technology Co."
 role: "Full-Stack Software Engineering Intern"
 location: "Guangzhou, China"

@@ -63,8 +63,9 @@ resume_data/
   projects/        Project records and reusable achievement bullets
   skills.md        Overall skills inventory
 templates/         LaTeX document base, section templates, and snippets
-src/prompts/       Ollama prompts for requirements and resume sections
-src/workflow.py    Workflow implementation
+src/
+  prompts/       Ollama prompts for requirements and resume sections
+  workflow.py    Workflow implementation
 main.py            Command-line entry point
 Job_Description.txt Default job description input
 ```

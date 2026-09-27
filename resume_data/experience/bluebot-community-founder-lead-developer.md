@@ -1,5 +1,5 @@
 ---
-id: bluebot-community-founder-lead-developer
+id: bluebot-community
 company: "BlueBot Community Project"
 role: "Founder, Lead Developer & Consultant"
 location: "Distributed Team"
