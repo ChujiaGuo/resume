@@ -1,0 +1,172 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome}
+\input{glyphtounicode}
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\bfseries\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeEducationHeading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeExperienceHeading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\begin{center}
+	\textbf{\Huge \scshape Chujia Guo} \\ \vspace{1pt}
+	\href{mailto:chujiaguo@gmail.com}{\underline{chujiaguo@gmail.com}}  $|$ \small 626-313-7468 $|$ 
+	\href{https://linkedin.com/in/guo-chujia}{\underline{linkedin.com/in/guo-chujia}}  $|$
+	\href{https://github.com/ChujiaGuo}{\underline{github.com/ChujiaGuo}} $|$
+    \href{https://chujia.dev}{\underline{chujia.dev}}
+\end{center}
+
+\section{Education}
+
+\resumeSubHeadingListStart
+
+\resumeEducationHeading{University of Maryland, College Park}{College Park, MD}{Master of Science in Data Science}{Sep 2026 -- Present}
+
+\resumeEducationHeading{University of Maryland, Baltimore County}{Baltimore, MD}{Bachelor of Science in Computer Science}{Sep 2022 -- May 2026}
+
+\resumeSubHeadingListEnd
+
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+  \small{\item{
+    \textbf{Languages}{: Python, SQL} \\
+    \textbf{Frameworks}{: TensorFlow} \\
+    \textbf{Developer Tools}{: Git, Docker, AWS, Google Cloud Platform} \\
+    \textbf{Libraries}{: pandas, NumPy, Matplotlib}
+  }}
+\end{itemize}
+
+\section{Experience}
+
+\resumeSubHeadingListStart
+
+\resumeExperienceHeading{Guangzhou Quantitative Software Technology Co.}{Jun 2025 -- Aug 2025}{Full-Stack Software Engineering Intern}{Guangzhou, China}
+\resumeItemListStart
+\resumeItem{Optimized Go backend APIs to broadcast real-time stock data to multiple concurrent internal clients via a proof-of-concept WebSocket implementation, reducing API response latency by 30\%.}
+\resumeItem{Engineered a Next.js portfolio dashboard using split React Context windows to isolate high-frequency tick updates by ticker, reducing component re-renders by 25\%.}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+\section{Projects}
+
+\resumeSubHeadingListStart
+
+\resumeProjectHeading{\underline{Pavilion (Badminton Session \& Skill-Rating Platform)}}{May 2026 -- Present}{Solo Developer}{\href{https://pavilion.chujia.dev}{pavilion.chujia.dev}}
+\resumeItemListStart
+\resumeItem{Designed a weighted ranking algorithm that converges player ratings within 3--5 placement matches, incorporating volatility damping and time-decay factors validated across 25 unit and integration tests.}
+\resumeItem{Guaranteed zero double-booking anomalies and verified 100\% of accessible database routes under concurrent load, authoring 61 automated tests and a live PostgreSQL testing container using pessimistic locking.}
+\resumeItem{Architected a domain-driven modular monolith using Next.js, Hono, and PostgreSQL to isolate 5 core domains for seamless microservices migration.}
+\resumeItemListEnd
+
+\resumeProjectHeading{\underline{Classic (AI Student Scheduling Tool)}}{Oct 2025 -- Jan 2026}{Solo Developer}{\href{https://github.com/ChujiaGuo/classic}{github.com/ChujiaGuo/classic}}
+\resumeItemListStart
+\resumeItem{Eliminated 100\% of token costs and reduced parsing latency to sub-second speeds on duplicate uploads, architecting a multi-provider LLM abstraction layer with an SHA-256 and schema-versioned SQLite cache.}
+\resumeItem{Reduced average academic schedule generation time by over 90\%, from 30 minutes of manual cross-referencing to under 2 minutes, exporting results as .ics files compatible with Google, Apple, and Outlook calendars.}
+\resumeItemListEnd
+
+\resumeProjectHeading{\underline{BlueBot}}{Mar 2020 -- May 2025}{Founder \& Lead Developer}{\href{https://github.com/ChujiaGuo/blueBot}{github.com/ChujiaGuo/blueBot}}
+\resumeItemListStart
+\resumeItem{Automated player identity verification with $>$95\% accuracy in under 10 seconds, integrating Google Cloud Vision and Tesseract OCR pipelines with Levenshtein distance matching across 10k+ player records.}
+\resumeItem{Engineered an asynchronous, event-driven bot architecture scaling to 10k+ members; implemented a hot-reload command system via runtime module cache-clearing and a process manager to block concurrent executions and prevent race conditions on shared state.}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+\end{document}
