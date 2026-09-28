@@ -14,7 +14,8 @@ from .ollama import (
 
 _LATEX_ESCAPES = {
     "\\": r"\textbackslash{}", "&": r"\&", "%": r"\%", "$": r"\$", "#": r"\#", "_": r"\_",
-    "{": r"\{", "}": r"\}", "~": r"\textasciitilde{}", "^": r"\textasciicircum{}",
+    "{": r"\{", "}": r"\}", "~": r"\textasciitilde{}", "^": r"\textasciicircum{}", "<": "$<$",
+    ">":"$>$",
 }
 
 
