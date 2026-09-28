@@ -45,7 +45,7 @@ python main.py --debug
 
 ## Output files
 
-- `Chujia_Guo_Software_Engineering_Resume.tex` — the newly tailored LaTeX source.
+- `<first-name>_<last-name>_<job-title>.tex` — the newly tailored LaTeX source.
 - The compiled PDF is copied to the project root by the `latexmk` configuration.
 - `build/ollama/requirements/` — extracted job requirements in JSON, named with the run date, company, and role.
 - `build/ollama/resume/` — timestamped copies of prior resume sources. Existing archive files are preserved; a suffix is added if needed to avoid overwriting one.

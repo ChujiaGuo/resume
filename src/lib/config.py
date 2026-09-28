@@ -8,7 +8,8 @@ RESUME_NAME = "Chujia_Guo_Software_Engineering_Resume.tex"
 REQUIREMENTS_PROMPT = ROOT / "src/prompts/01-extract-job-requirements.md"
 RESUME_DATA = ROOT / "resume_data"
 TEMPLATES = ROOT / "templates"
-BASE_RESUME_TEMPLATE = TEMPLATES / "00-resume-template.tex"
+PROMPTS = ROOT / "src/prompts"
+BASE_RESUME_TEMPLATE = TEMPLATES / "latex/00-resume-template.tex"
 
 
 def _string_array_schema(*, max_items: int | None = None) -> dict[str, object]:
@@ -91,36 +92,36 @@ SECTION_CONFIGS = (
     {
         "key": "education",
         "title": "Education",
-        "prompt": ROOT / "src/prompts/02-education.md",
+        "prompt": PROMPTS / "02-education.md",
         "data": RESUME_DATA / "education",
-        "template": TEMPLATES / "01-education-template.tex",
+        "template": TEMPLATES / "latex/01-education-template.tex",
         "list_wrapper": True,
         "schema": EDUCATION_SCHEMA,
     },
     {
         "key": "skills",
         "title": "Technical Skills",
-        "prompt": ROOT / "src/prompts/03-skills.md",
+        "prompt": PROMPTS / "03-skills.md",
         "data": RESUME_DATA / "skills.md",
-        "template": TEMPLATES / "02-skills-template.tex",
+        "template": TEMPLATES / "latex/02-skills-template.tex",
         "list_wrapper": False,
         "schema": SKILLS_SCHEMA,
     },
     {
         "key": "experience",
         "title": "Experience",
-        "prompt": ROOT / "src/prompts/04-experience.md",
+        "prompt": PROMPTS / "04-experience.md",
         "data": RESUME_DATA / "experience",
-        "template": TEMPLATES / "03-experience-template.tex",
+        "template": TEMPLATES / "latex/03-experience-template.tex",
         "list_wrapper": True,
         "schema": EXPERIENCE_SCHEMA,
     },
     {
         "key": "projects",
         "title": "Projects",
-        "prompt": ROOT / "src/prompts/05-projects.md",
+        "prompt": PROMPTS / "05-projects.md",
         "data": RESUME_DATA / "projects",
-        "template": TEMPLATES / "04-projects-template.tex",
+        "template": TEMPLATES / "latex/04-projects-template.tex",
         "list_wrapper": True,
         "schema": PROJECTS_SCHEMA,
     },
