@@ -43,7 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help=(
             "LaTeX output path (relative paths are resolved from the project root). "
-            "Defaults to <first-name>_<last-name>_<company>_<job-title>.tex."
+            "Defaults to <first-name>_<last-name>_<job-title>.tex."
         ),
     )
     parser.add_argument(

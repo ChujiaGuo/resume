@@ -21,7 +21,7 @@ def _safe_slug(value: str) -> str:
     return slug or "job"
 
 
-def _default_resume_path(template: str, company: str, job_title: str) -> Path:
+def _default_resume_path(template: str, job_title: str) -> Path:
     """Build the default output name from the candidate name in the base template."""
     match = re.search(r"\\textbf\s*\{\\Huge\s+\\scshape\s+([^{}]+)\}", template)
     if not match:
@@ -36,9 +36,8 @@ def _default_resume_path(template: str, company: str, job_title: str) -> Path:
             "provide --output with an explicit .tex path."
         )
     first_name, last_name = _safe_slug(name_parts[0]), _safe_slug(name_parts[-1])
-    company_slug = _safe_slug(company)
-    role_slug = _safe_slug(job_title)
-    return ROOT / f"{first_name}_{last_name}_{company_slug}_{role_slug}.tex"
+    role = _safe_slug(job_title)
+    return ROOT / f"{first_name}_{last_name}_{role}.tex"
 
 
 def _unique_path(path: Path) -> Path:

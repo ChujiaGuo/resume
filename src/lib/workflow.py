@@ -84,7 +84,7 @@ def run(
     base_template = _read_text(BASE_RESUME_TEMPLATE)
     resume_path = output_path
     if resume_path is None:
-        resume_path = _default_resume_path(base_template, company, role)
+        resume_path = _default_resume_path(base_template, role)
     elif not resume_path.is_absolute():
         resume_path = ROOT / resume_path
     if resume_path.suffix.lower() != ".tex":
