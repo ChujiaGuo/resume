@@ -4,7 +4,7 @@ title: "BlueBot"
 role: "Founder & Lead Developer"
 url: "https://github.com/ChujiaGuo/blueBot"
 start_date: "2020-03"
-end_date: "2025-05"
+end_date: "2026-06"
 skills:
   - Node.js
   - Event-Driven Architecture

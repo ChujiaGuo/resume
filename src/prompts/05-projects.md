@@ -11,7 +11,7 @@ Keep every selected bullet grounded in its source facts, scope, technologies, re
 {{SECTION_DATA}}
 </section_data>
 
-Return one JSON object with an entries array. Each entry must contain name, dates, role, links, and bullets. Links is an array of objects with label and url strings. Bullets is an array of no more than three strings. Example:
+Return one JSON object with an entries array. Each entry must contain name, dates, role, links, and bullets. Links is an array of objects with label and url strings. Bullets is an array of at least one, but no more than three strings. Example:
 {"entries":[{"name":"Project","dates":"mmm yyyy -- mmm yyyy","role":"Personal Project","links":[{"label":"GitHub","url":"https://github.com/example/project"}],"bullets":["Accomplishment grounded in the source"]}]}
 
 Return an empty entries array if no projects apply. Return strict JSON only, with no Markdown fences, explanation, or extra keys. All values must be content data; do not generate document markup or formatting syntax.

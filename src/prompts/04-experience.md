@@ -11,7 +11,7 @@ Keep every selected bullet grounded in its source facts, scope, technologies, re
 {{SECTION_DATA}}
 </section_data>
 
-Return one JSON object with an entries array. Each entry must contain company, dates, role, location, and bullets, where bullets is an array of no more than three strings. Example:
+Return one JSON object with an entries array. Each entry must contain company, dates, role, location, and bullets, where bullets is an array of at least one, but no more than three strings. Example:
 {"entries":[{"company":"Company","dates":"mmm yyyy -- Present","role":"Role","location":"City, ST","bullets":["Accomplishment grounded in the source"]}]}
 
 Return an empty entries array if no roles apply. Return strict JSON only, with no Markdown fences, explanation, or extra keys. All values must be content data; do not generate document markup or formatting syntax.
