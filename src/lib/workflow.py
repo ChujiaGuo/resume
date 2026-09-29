@@ -8,14 +8,13 @@ from .config import (
     BASE_RESUME_TEMPLATE,
     REQUIREMENTS_PROMPT,
     REQUIREMENTS_SCHEMA,
-    RESUME_NAME,
     SECTION_CONFIGS,
     ROOT,
 )
 from .errors import WorkflowError
 from .file import (
     _compile_resume, _find_cached_requirements, _find_cached_resume,
-    _resume_archive_path, _safe_slug, _unique_path, _write_atomic,
+    _default_resume_path, _resume_archive_path, _safe_slug, _unique_path, _write_atomic,
 )
 from .renderer import _validate_latex, _validate_requirements, populate_section
 from .ollama import (
@@ -28,6 +27,7 @@ def run(
     model: str,
     base_url: str,
     *,
+    output_path: Path | None = None,
     debug: bool = False,
 ) -> tuple[Path, Path | None]:
     job_description = _read_text(job_description_path)
@@ -81,13 +81,26 @@ def run(
 
     company = requirements["company"].strip() or "unknown-company"
     role = requirements["role"].strip() or "unknown-role"
-    cached_resume = _find_cached_resume(job_description, date.fromisoformat(run_date))
+    base_template = _read_text(BASE_RESUME_TEMPLATE)
+    resume_path = output_path
+    if resume_path is None:
+        resume_path = _default_resume_path(base_template, company, role)
+    elif not resume_path.is_absolute():
+        resume_path = ROOT / resume_path
+    if resume_path.suffix.lower() != ".tex":
+        raise WorkflowError(f"Resume output path must end in .tex: {resume_path}")
+
+    cached_resume = _find_cached_resume(job_description, date.fromisoformat(run_date), resume_path)
     if cached_resume:
         cached_resume_path, tailored_source = cached_resume
-        print(f"Using cached resume: {cached_resume_path.relative_to(ROOT)}", flush=True)
+        try:
+            display_cached_path = cached_resume_path.relative_to(ROOT)
+        except ValueError:
+            display_cached_path = cached_resume_path
+        print(f"Using cached resume: {display_cached_path}", flush=True)
     else:
         print("Populating resume sections...", flush=True)
-        tailored_source = _read_text(BASE_RESUME_TEMPLATE)
+        tailored_source = base_template
         for config in SECTION_CONFIGS:
             print(f"Populating {config['title']}...", flush=True)
             tailored_source = populate_section(
@@ -101,7 +114,6 @@ def run(
         tailored_source = tailored_source.rstrip() + "\n\n\\end{document}\n"
         tailored_source = f"% Generated: {run_date} | Company: {company} | Role: {role}\n" + tailored_source
         tailored_source = _validate_latex(tailored_source)
-    resume_path = ROOT / RESUME_NAME
     archive_path: Path | None = None
     if resume_path.is_file():
         current_source = _read_text(resume_path)
@@ -127,7 +139,11 @@ def run(
             shutil.copy2(archive_path, resume_path)
         raise WorkflowError(f"Could not write the tailored resume: {exc}") from exc
 
-    print(f"Tailored resume: {resume_path.relative_to(ROOT)}", flush=True)
+    try:
+        display_resume_path = resume_path.relative_to(ROOT)
+    except ValueError:
+        display_resume_path = resume_path
+    print(f"Tailored resume: {display_resume_path}", flush=True)
     if archive_path is not None:
         print(f"Archived previous resume: {archive_path.relative_to(ROOT)}", flush=True)
     return requirements_path, archive_path

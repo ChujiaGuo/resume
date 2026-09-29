@@ -39,6 +39,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Job description input (default: Job_Description.txt in the project root).",
     )
     parser.add_argument(
+        "--output",
+        type=Path,
+        help=(
+            "LaTeX output path (relative paths are resolved from the project root). "
+            "Defaults to <first-name>_<last-name>_<company>_<job-title>.tex."
+        ),
+    )
+    parser.add_argument(
         "--model",
         default=os.environ.get("OLLAMA_MODEL", DEFAULT_MODEL),
         help=f"Installed Ollama model (default: {DEFAULT_MODEL}, or OLLAMA_MODEL).",
@@ -58,15 +66,27 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _execute(args: argparse.Namespace) -> int:
     job_path = args.job_description if args.job_description.is_absolute() else ROOT / args.job_description
+    output_path = args.output
+    if output_path is not None and not output_path.is_absolute():
+        output_path = ROOT / output_path
     try:
-        requirements_path, archive_path = run(job_path, args.model, args.ollama_url, debug=args.debug)
+        requirements_path, archive_path = run(
+            job_path, args.model, args.ollama_url, output_path=output_path, debug=args.debug
+        )
     except WorkflowError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
-    print(f"Requirements: {requirements_path.relative_to(ROOT)}")
+    print(f"Requirements: {_display_path(requirements_path)}")
     if archive_path is not None:
-        print(f"Archive: {archive_path.relative_to(ROOT)}")
+        print(f"Archive: {_display_path(archive_path)}")
     return 0
+
+
+def _display_path(path: Path) -> Path:
+    try:
+        return path.relative_to(ROOT)
+    except ValueError:
+        return path
 
 
 def main(argv: list[str] | None = None) -> int:

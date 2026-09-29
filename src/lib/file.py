@@ -10,7 +10,7 @@ from datetime import timedelta
 from typing import Any
 from datetime import date
 from pathlib import Path
-from .config import RESUME_NAME, ROOT
+from .config import ROOT
 from .errors import WorkflowError
 from .renderer import _validate_latex, _validate_requirements
 
@@ -19,6 +19,26 @@ def _safe_slug(value: str) -> str:
     slug = value.strip().lower()
     slug = re.sub(r"[^a-z0-9]+", "-", slug).strip("-")
     return slug or "job"
+
+
+def _default_resume_path(template: str, company: str, job_title: str) -> Path:
+    """Build the default output name from the candidate name in the base template."""
+    match = re.search(r"\\textbf\s*\{\\Huge\s+\\scshape\s+([^{}]+)\}", template)
+    if not match:
+        raise WorkflowError(
+            "Cannot determine the candidate's first and last name from the resume template; "
+            "provide --output with an explicit .tex path."
+        )
+    name_parts = match.group(1).strip().split()
+    if len(name_parts) < 2:
+        raise WorkflowError(
+            "The resume template must contain a first and last name to derive the output filename; "
+            "provide --output with an explicit .tex path."
+        )
+    first_name, last_name = _safe_slug(name_parts[0]), _safe_slug(name_parts[-1])
+    company_slug = _safe_slug(company)
+    role_slug = _safe_slug(job_title)
+    return ROOT / f"{first_name}_{last_name}_{company_slug}_{role_slug}.tex"
 
 
 def _unique_path(path: Path) -> Path:
@@ -30,6 +50,13 @@ def _unique_path(path: Path) -> Path:
         if not candidate.exists():
             return candidate
         suffix += 1
+
+
+def _display_path(path: Path) -> Path:
+    try:
+        return path.relative_to(ROOT)
+    except ValueError:
+        return path
 
 
 def _resume_archive_path(source: str, fallback_date: str) -> Path:
@@ -68,14 +95,14 @@ def _write_atomic(path: Path, content: str) -> None:
     except OSError as exc:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
-        raise WorkflowError(f"Cannot write {path.relative_to(ROOT)}: {exc}") from exc
+        raise WorkflowError(f"Cannot write {_display_path(path)}: {exc}") from exc
 
 
 def _compile_resume(resume_path: Path, *, debug: bool = False) -> None:
     if shutil.which("latexmk") is None:
         raise WorkflowError("`latexmk` is not installed or is not available on PATH")
     result = subprocess.run(
-        ["latexmk", resume_path.name],
+        ["latexmk", str(resume_path)],
         cwd=ROOT,
         text=True,
         stdout=subprocess.PIPE,
@@ -127,15 +154,19 @@ def _find_cached_requirements(job_description: str, run_date: date) -> tuple[Pat
     return path, requirements
 
 
-def _find_cached_resume(job_description: str, run_date: date) -> tuple[Path, str] | None:
+def _find_cached_resume(
+    job_description: str, run_date: date, output_path: Path
+) -> tuple[Path, str] | None:
     """Find a generated resume for the same stated company and role from the past week."""
     resume_dir = ROOT / "build" / "ollama" / "resume"
     jd_identity = re.sub(r"\s+", " ", job_description).casefold()
     candidates: list[tuple[date, Path, str]] = []
     resume_paths = list(resume_dir.glob("*.tex")) if resume_dir.is_dir() else []
-    current_resume = ROOT / RESUME_NAME
-    if current_resume.is_file():
-        resume_paths.append(current_resume)
+    # Root-level generated resumes include files from the previous fixed-name
+    # workflow, so scan them as caches without keeping a user-specific filename.
+    resume_paths.extend(ROOT.glob("*.tex"))
+    resume_paths.append(output_path)
+    resume_paths = list(dict.fromkeys(path for path in resume_paths if path.is_file()))
 
     for path in resume_paths:
         try:

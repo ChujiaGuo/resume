@@ -26,13 +26,19 @@ Start Ollama before running the workflow. Its default API address is `http://loc
    python main.py
    ```
 
-The workflow extracts requirements from the job description, asks Ollama to generate each resume section, assembles the LaTeX source, archives the previous root resume, and compiles the new source with `latexmk`.
+The workflow extracts requirements from the job description, asks Ollama to generate each resume section, assembles the LaTeX source, archives an existing source at the selected output path, and compiles the new source with `latexmk`.
+
+By default, the output is named `<first-name>_<last-name>_<company>_<job-title>.tex`. The first and last names come from the name in the base LaTeX template; the company and job title are converted to lowercase, hyphenated filename segments. If the company is not stated, the company segment is `unknown-company`. Set `--output` to choose a different path; relative paths are resolved from the project root:
+
+```sh
+python main.py --output output/custom-resume.tex
+```
 
 To use a different model, Ollama server, or job-description file:
 
 ```sh
 python main.py --model <installed-model> --ollama-url http://localhost:11434 \
-  --job-description path/to/job-description.txt
+  --job-description path/to/job-description.txt --output output/resume.tex
 ```
 
 The model and server URL can also be set with `OLLAMA_MODEL` and `OLLAMA_URL`. Command-line options take precedence over those environment variables. Use `python main.py --help` to see the available options.
@@ -45,10 +51,10 @@ python main.py --debug
 
 ## Output files
 
-- `<first-name>_<last-name>_<job-title>.tex` — the newly tailored LaTeX source.
+- `<first-name>_<last-name>_<company>_<job-title>.tex` (or the path given with `--output`) — the newly tailored LaTeX source.
 - The compiled PDF is copied to the project root by the `latexmk` configuration.
 - `build/ollama/requirements/` — extracted job requirements in JSON, named with the run date, company, and role.
-- `build/ollama/resume/` — timestamped copies of prior resume sources. Existing archive files are preserved; a suffix is added if needed to avoid overwriting one.
+- `build/ollama/resume/` — timestamped copies of prior resume sources replaced at the selected output path. Existing archive files are preserved; a suffix is added if needed to avoid overwriting one.
 - `build/latexmk/` — LaTeX build intermediates.
 - `debug.log` — created or updated when running with `--debug`.
 

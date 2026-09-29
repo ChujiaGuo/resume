@@ -4,7 +4,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MODEL = "gemma4:12b"
 DEFAULT_OLLAMA_URL = "http://localhost:11434"
-RESUME_NAME = "Chujia_Guo_Software_Engineering_Resume.tex"
 REQUIREMENTS_PROMPT = ROOT / "src/prompts/01-extract-job-requirements.md"
 RESUME_DATA = ROOT / "resume_data"
 TEMPLATES = ROOT / "templates"
