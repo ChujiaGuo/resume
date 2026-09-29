@@ -29,7 +29,6 @@
 - Cursor
 - API Design
 - CI/CD
-- System Architecture
 
 ## Libraries
 
