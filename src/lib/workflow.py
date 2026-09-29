@@ -4,7 +4,6 @@ import json
 import shutil
 from datetime import date
 from pathlib import Path
-from .cache import _find_cached_requirements, _find_cached_resume
 from .config import (
     BASE_RESUME_TEMPLATE,
     REQUIREMENTS_PROMPT,
@@ -14,11 +13,14 @@ from .config import (
     ROOT,
 )
 from .errors import WorkflowError
-from .files import _compile_resume, _resume_archive_path, _safe_slug, _unique_path, _write_atomic
-from .latex import _validate_latex, _validate_requirements
-from .ollama import _chat, _ensure_model
-from .prompts import _log_debug_prompt, _prompt_text, _read_text, _replace_tokens
-from .section import populate_section
+from .file import (
+    _compile_resume, _find_cached_requirements, _find_cached_resume,
+    _resume_archive_path, _safe_slug, _unique_path, _write_atomic,
+)
+from .renderer import _validate_latex, _validate_requirements, populate_section
+from .ollama import (
+    _chat, _ensure_model, _log_debug_prompt, _prompt_text, _read_text, _replace_tokens,
+)
 
 
 def run(
