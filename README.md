@@ -26,13 +26,15 @@ Start Ollama before running the workflow. Its default API address is `http://loc
    python main.py
    ```
 
-The workflow extracts requirements from the job description, asks Ollama to generate each resume section, assembles the LaTeX source, archives an existing source at the selected output path, and compiles the new source with `latexmk`.
+At the start of each run, the workflow moves root-level resume and cover-letter sources into their respective caches and deletes root-level PDFs. It then extracts requirements from the job description, asks Ollama to generate each resume section, assembles the LaTeX source, and compiles it with `latexmk`. Finally, it drafts a cover letter from the full experience and project library, the generated resume, and the job description, and compiles that source too.
 
 By default, the output is named `<first-name>_<last-name>_<job-title>.tex`. The first and last names come from the name in the base LaTeX template, and the job title is converted to a lowercase, hyphenated filename segment. Set `--output` to choose a different path; relative paths are resolved from the project root:
 
 ```sh
 python main.py --output output/custom-resume.tex
 ```
+
+The cover letter is written beside the resume as `custom-resume-cover-letter.tex`. Replaced resume and cover-letter sources are preserved in `build/ollama/resume/` and `build/ollama/cover_letter/` respectively. Recent cover-letter sources with matching company and role metadata are reused as caches.
 
 To use a different model, Ollama server, or job-description file:
 
@@ -52,19 +54,21 @@ python main.py --debug
 ## Output files
 
 - `<first-name>_<last-name>_<job-title>.tex` (or the path given with `--output`) — the newly tailored LaTeX source.
+- `<resume-name>-cover-letter.tex` — the tailored cover letter, generated from the resume, full experience and project library, and job description.
 - The compiled PDF is copied to the project root by the `latexmk` configuration.
 - `build/ollama/requirements/` — extracted job requirements in JSON, named with the run date, company, and role.
 - `build/ollama/resume/` — timestamped copies of prior resume sources replaced at the selected output path. Existing archive files are preserved; a suffix is added if needed to avoid overwriting one.
+- `build/ollama/cover_letter/` — timestamped cover-letter cache sources. Existing files are preserved; a suffix is added if needed to avoid overwriting one.
 - `build/latexmk/` — LaTeX build intermediates.
 - `debug.log` — created or updated when running with `--debug`.
 
-To move every `.tex` resume currently in the project root into the cache, run:
+The workflow runs this cache step automatically, routing resumes to `build/ollama/resume/` and files ending in `-cover-letter.tex` to `build/ollama/cover_letter/`, then deleting root-level PDFs. To run it independently, use:
 
 ```sh
-python scripts/cache_resumes.py
+python src/scripts/cache_resumes.py
 ```
 
-The script uses each resume's generated date, company, and role metadata, preserves existing cache files, skips exact duplicates on later runs, and deletes each root copy only after confirming its cached copy exists and matches.
+The script uses each source's generated date, company, and role metadata, preserves existing cache files, skips exact duplicates on later runs, and deletes each root source only after confirming its cached copy exists and matches.
 
 Generated build files and the debug log are excluded from version control.
 
@@ -90,4 +94,4 @@ Add each role, project, or education entry as a Markdown file in its correspondi
 
 Content must reflect candidate-provided facts. Do not add qualifications, results, or metrics based on the job description. The `skills`, `archetypes`, and `strength` fields help select and order reusable bullets; they are metadata, not claims to append to the resume. Job-specific choices belong in the generated resume, so the underlying content library remains reusable.
 
-The workflow reads the base document from `templates/00-resume-template.tex`, uses the numbered section prompts in `src/prompts/`, and formats results with the corresponding templates in `templates/`. Skills returns a complete section; the other section prompts return entry snippets that the workflow places inside section and list wrappers.
+The workflow reads the resume base and section templates from `templates/latex/`, uses the numbered prompts in `src/prompts/`, and formats results with the corresponding templates. Skills returns a complete section; the other resume prompts return entry data that the workflow places inside section and list wrappers. The cover-letter base ends at its `Begin Content` marker; its body template holds the introduction, project and experience examples, and company-specific closing. A fixed sign-off is appended by the workflow.

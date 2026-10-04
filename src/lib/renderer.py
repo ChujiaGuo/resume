@@ -239,3 +239,41 @@ def populate_section(
     if config["list_wrapper"]:
         section_parts.append(r"\resumeSubHeadingListEnd")
     return base.rstrip() + "\n\n" + "\n\n".join(section_parts) + "\n"
+
+
+def render_cover_letter_content(template: str, data: dict[str, Any]) -> str:
+    """Fill the cover-letter body template with validated, escaped model prose."""
+    examples = "\n".join(
+        r"\item \textbf{" + escape_latex(item["title"]) + ":} " + escape_latex(item["body"])
+        for item in data["examples"]
+    )
+    return (
+        template.replace("[Introduction]", escape_latex(data["introduction"]))
+        .replace("[Examples]", examples)
+        .replace("[Company Motivation]", escape_latex(data["company_motivation"]))
+        .strip()
+    )
+
+
+def validate_cover_letter_response(raw: str) -> dict[str, Any]:
+    """Parse and validate the model's structured cover-letter prose."""
+    try:
+        data = json.loads(_strip_code_fence(raw))
+    except json.JSONDecodeError as exc:
+        raise WorkflowError(f"The cover-letter prompt did not return valid JSON: {exc}") from exc
+    if not isinstance(data, dict) or set(data) != {"introduction", "examples", "company_motivation"}:
+        raise WorkflowError("The cover-letter response must contain introduction, examples, and company_motivation")
+    for field in ("introduction", "company_motivation"):
+        if not isinstance(data[field], str) or not data[field].strip():
+            raise WorkflowError(f"The cover-letter field '{field}' must be a non-empty string")
+    examples = data["examples"]
+    if not isinstance(examples, list) or not 2 <= len(examples) <= 4:
+        raise WorkflowError("The cover-letter response must contain between two and four examples")
+    for index, item in enumerate(examples, 1):
+        if (
+            not isinstance(item, dict)
+            or set(item) != {"title", "body"}
+            or any(not isinstance(item[key], str) or not item[key].strip() for key in ("title", "body"))
+        ):
+            raise WorkflowError(f"Cover-letter example {index} needs non-empty title and body strings")
+    return data

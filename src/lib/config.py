@@ -9,6 +9,13 @@ RESUME_DATA = ROOT / "resume_data"
 TEMPLATES = ROOT / "templates"
 PROMPTS = ROOT / "src/prompts"
 BASE_RESUME_TEMPLATE = TEMPLATES / "latex/00-resume-template.tex"
+BASE_COVER_LETTER_TEMPLATE = TEMPLATES / "latex/05-cover-letter-template.tex"
+COVER_LETTER_CONTENT_TEMPLATE = TEMPLATES / "latex/06-cover-letter-content-template.tex"
+COVER_LETTER_PROMPT = PROMPTS / "06-cover-letter.md"
+COVER_LETTER_ENDING = (
+    r"\par\vspace{12pt} Thanks for your time, and I look forward to the conversation. "
+    r"\par\vspace{12pt} Best regards,\par\vspace{6pt} \textbf{Chujia Guo}"
+)
 
 
 def _string_array_schema(*, max_items: int | None = None) -> dict[str, object]:
@@ -84,6 +91,20 @@ REQUIREMENTS_SCHEMA = {
         "notes": _string_array_schema(),
     },
     "required": ["role", "company", "location", "minimum_requirements", "preferred_requirements", "notes"],
+    "additionalProperties": False,
+}
+COVER_LETTER_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "introduction": {"type": "string"},
+        "examples": {"type": "array", "minItems": 2, "maxItems": 4, "items": {
+            "type": "object",
+            "properties": {"title": {"type": "string"}, "body": {"type": "string"}},
+            "required": ["title", "body"], "additionalProperties": False,
+        }},
+        "company_motivation": {"type": "string"},
+    },
+    "required": ["introduction", "examples", "company_motivation"],
     "additionalProperties": False,
 }
 

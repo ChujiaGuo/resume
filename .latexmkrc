@@ -10,7 +10,7 @@ $silent = 1;
 # Automatically copy the generated PDF from build/ back to the root working directory
 $cleanup_mode = 0;
 $compiling_cmd = 0;
-$success_cmd = 'mv %D .';
+$success_cmd = 'mv %D . && latexmk -c %R.tex';
 
 # Extra file extensions to remove when running cleanup
 $clean_ext = 'synctex.gz synctex.gz(busy) run.xml bcf fdb_latexmk fls nav snm vrb';

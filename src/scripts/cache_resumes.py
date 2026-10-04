@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Copy root-level generated resumes into the workflow's resume cache."""
+"""Cache root-level sources and remove generated PDFs from the project root."""
 from __future__ import annotations
 
 import re
@@ -8,8 +8,9 @@ import sys
 from datetime import date
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-ARCHIVE_DIR = ROOT / "build" / "ollama" / "resume"
+ROOT = Path(__file__).resolve().parent.parent.parent
+RESUME_ARCHIVE_DIR = ROOT / "build" / "ollama" / "resume"
+COVER_LETTER_ARCHIVE_DIR = ROOT / "build" / "ollama" / "cover_letter"
 METADATA_RE = re.compile(
     r"^% Generated: (\d{4}-\d{2}-\d{2}) \| Company: (.*?) \| Role: (.*?)\s*$"
 )
@@ -51,38 +52,54 @@ def unique_destination(base: Path, content: bytes) -> Path | None:
 
 
 def main() -> int:
-    resumes = sorted(path for path in ROOT.glob("*.tex") if path.is_file())
-    if not resumes:
-        print("No root-level .tex resumes found.")
+    sources = sorted(path for path in ROOT.glob("*.tex") if path.is_file())
+    pdfs = sorted(path for path in ROOT.glob("*.pdf") if path.is_file())
+    if not sources and not pdfs:
+        print("No root-level resume sources or PDFs found.")
         return 0
 
-    ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+    if sources:
+        RESUME_ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
+        COVER_LETTER_ARCHIVE_DIR.mkdir(parents=True, exist_ok=True)
     copied = 0
     skipped = 0
-    for source in resumes:
+    for source in sources:
         try:
             content = source.read_bytes()
             text = content.decode("utf-8")
-            base = ARCHIVE_DIR / archive_name(source, text)
+            is_cover_letter = source.stem.endswith("-cover-letter")
+            archive_dir = COVER_LETTER_ARCHIVE_DIR if is_cover_letter else RESUME_ARCHIVE_DIR
+            base = archive_dir / archive_name(source, text)
             destination = unique_destination(base, content)
+            source_type = "cover letter" if is_cover_letter else "resume"
             if destination is None:
-                # The identical cache copy is already durable, so the root copy
-                # can be removed to complete the requested move.
+                # The identical cache copy is already durable, so remove the root
+                # copy to complete the move into its type-specific cache.
                 source.unlink()
-                print(f"Already cached and removed from root: {source.name}")
+                print(f"Already cached {source_type}; removed root copy: {source.name}")
                 skipped += 1
                 continue
             shutil.copy2(source, destination)
             if destination.read_bytes() != content:
                 raise OSError(f"Cache copy verification failed: {destination}")
             source.unlink()
-            print(f"Cached and removed {source.name} -> {destination.relative_to(ROOT)}")
+            print(f"Cached {source_type} and removed {source.name} -> {destination.relative_to(ROOT)}")
             copied += 1
         except (OSError, UnicodeDecodeError) as exc:
             print(f"Could not cache {source.name}: {exc}", file=sys.stderr)
             return 1
 
-    print(f"Done: {copied} copied, {skipped} already cached.")
+    removed_pdfs = 0
+    for pdf in pdfs:
+        try:
+            pdf.unlink()
+            print(f"Removed root-level PDF: {pdf.name}")
+            removed_pdfs += 1
+        except OSError as exc:
+            print(f"Could not remove {pdf.name}: {exc}", file=sys.stderr)
+            return 1
+
+    print(f"Done: {copied} sources cached, {skipped} already cached, {removed_pdfs} PDFs removed.")
     return 0
 
 

@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import tempfile
 import json
+import sys
 from datetime import timedelta
 from typing import Any
 from datetime import date
@@ -58,6 +59,28 @@ def _display_path(path: Path) -> Path:
         return path
 
 
+def _cache_root_resumes() -> None:
+    """Run the standalone resume cache before each tailoring workflow."""
+    script = ROOT / "src" / "scripts" / "cache_resumes.py"
+    print("Caching root-level sources and removing PDFs...", flush=True)
+    try:
+        result = subprocess.run(
+            [sys.executable, str(script)],
+            cwd=ROOT,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            check=False,
+        )
+    except OSError as exc:
+        raise WorkflowError(f"Could not run the resume cache script: {exc}") from exc
+    if result.stdout:
+        print(result.stdout, end="" if result.stdout.endswith("\n") else "\n", flush=True)
+    if result.returncode != 0:
+        details = result.stdout.strip() or "No output was captured."
+        raise WorkflowError(f"Resume cache script failed (exit {result.returncode}):\n{details}")
+
+
 def _resume_archive_path(source: str, fallback_date: str) -> Path:
     """Build a cache filename from the resume being archived, not its replacement."""
     metadata = re.match(
@@ -77,6 +100,25 @@ def _resume_archive_path(source: str, fallback_date: str) -> Path:
         role = "unknown-role"
     filename = f"{date_part}_{_safe_slug(company)}_{_safe_slug(role)}.tex"
     return _unique_path(ROOT / "build" / "ollama" / "resume" / filename)
+
+
+def _cover_letter_archive_path(source: str, fallback_date: str) -> Path:
+    """Build a non-overwriting archive path using the source letter's metadata."""
+    metadata = re.match(
+        r"^% Generated: (\d{4}-\d{2}-\d{2}) \| Company: (.*?) \| Role: (.*?)\s*$",
+        source.splitlines()[0] if source.splitlines() else "",
+    )
+    if metadata:
+        try:
+            date_part = date.fromisoformat(metadata.group(1)).isoformat()
+        except ValueError:
+            date_part = fallback_date
+        company = metadata.group(2).strip() or "unknown-company"
+        role = metadata.group(3).strip() or "unknown-role"
+    else:
+        date_part, company, role = fallback_date, "unknown-company", "unknown-role"
+    filename = f"{date_part}_{_safe_slug(company)}_{_safe_slug(role)}.tex"
+    return _unique_path(ROOT / "build" / "ollama" / "cover_letter" / filename)
 
 
 def _write_atomic(path: Path, content: str) -> None:
@@ -168,6 +210,45 @@ def _find_cached_resume(
     resume_paths = list(dict.fromkeys(path for path in resume_paths if path.is_file()))
 
     for path in resume_paths:
+        try:
+            source = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        match = re.match(r"% Generated: (\d{4}-\d{2}-\d{2}) \| Company: (.*?) \| Role: (.*?)\s*\n", source)
+        if not match:
+            continue
+        try:
+            saved_date = date.fromisoformat(match.group(1))
+        except ValueError:
+            continue
+        if not (run_date - timedelta(days=2) <= saved_date <= run_date):
+            continue
+        company, role = match.group(2).strip(), match.group(3).strip()
+        if company and role and company.casefold() in jd_identity and role.casefold() in jd_identity:
+            try:
+                source = _validate_latex(source)
+            except WorkflowError:
+                continue
+            candidates.append((saved_date, path, source))
+    if not candidates:
+        return None
+    _, path, source = max(candidates, key=lambda candidate: (candidate[0], candidate[1].name))
+    return path, source
+
+
+def _find_cached_cover_letter(
+    job_description: str, run_date: date, output_path: Path
+) -> tuple[Path, str] | None:
+    """Find a recent valid cover letter for the same stated company and role."""
+    cache_dir = ROOT / "build" / "ollama" / "cover_letter"
+    jd_identity = re.sub(r"\s+", " ", job_description).casefold()
+    candidates: list[tuple[date, Path, str]] = []
+    letter_paths = list(cache_dir.glob("*.tex")) if cache_dir.is_dir() else []
+    letter_paths.extend(ROOT.glob("*-cover-letter.tex"))
+    letter_paths.append(output_path)
+    letter_paths = list(dict.fromkeys(path for path in letter_paths if path.is_file()))
+
+    for path in letter_paths:
         try:
             source = path.read_text(encoding="utf-8")
         except OSError:

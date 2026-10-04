@@ -70,15 +70,18 @@ def _execute(args: argparse.Namespace) -> int:
     if output_path is not None and not output_path.is_absolute():
         output_path = ROOT / output_path
     try:
-        requirements_path, archive_path = run(
+        requirements_path, archive_path, cover_letter_path, cover_letter_archive = run(
             job_path, args.model, args.ollama_url, output_path=output_path, debug=args.debug
         )
     except WorkflowError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     print(f"Requirements: {_display_path(requirements_path)}")
+    print(f"Cover letter: {_display_path(cover_letter_path)}")
     if archive_path is not None:
         print(f"Archive: {_display_path(archive_path)}")
+    if cover_letter_archive is not None:
+        print(f"Cover letter archive: {_display_path(cover_letter_archive)}")
     return 0
 
 
