@@ -58,6 +58,14 @@ python main.py --debug
 - `build/latexmk/` — LaTeX build intermediates.
 - `debug.log` — created or updated when running with `--debug`.
 
+To move every `.tex` resume currently in the project root into the cache, run:
+
+```sh
+python scripts/cache_resumes.py
+```
+
+The script uses each resume's generated date, company, and role metadata, preserves existing cache files, skips exact duplicates on later runs, and deletes each root copy only after confirming its cached copy exists and matches.
+
 Generated build files and the debug log are excluded from version control.
 
 ## Project layout

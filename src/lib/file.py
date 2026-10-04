@@ -118,7 +118,7 @@ def _compile_resume(resume_path: Path, *, debug: bool = False) -> None:
 
 
 def _find_cached_requirements(job_description: str, run_date: date) -> tuple[Path, dict[str, Any]] | None:
-    """Find a valid requirements record for this company and role from the past week."""
+    """Find a valid requirements record for this company and role from the past two days."""
     requirements_dir = ROOT / "build" / "ollama" / "requirements"
     if not requirements_dir.is_dir():
         return None
@@ -132,7 +132,7 @@ def _find_cached_requirements(job_description: str, run_date: date) -> tuple[Pat
             saved_date = date.fromisoformat(match.group(1))
         except ValueError:
             continue
-        if not (run_date - timedelta(days=7) <= saved_date <= run_date):
+        if not (run_date - timedelta(days=2) <= saved_date <= run_date):
             continue
         try:
             requirements = _validate_requirements(path.read_text(encoding="utf-8"))
@@ -156,7 +156,7 @@ def _find_cached_requirements(job_description: str, run_date: date) -> tuple[Pat
 def _find_cached_resume(
     job_description: str, run_date: date, output_path: Path
 ) -> tuple[Path, str] | None:
-    """Find a generated resume for the same stated company and role from the past week."""
+    """Find a generated resume for the same stated company and role from the past two days."""
     resume_dir = ROOT / "build" / "ollama" / "resume"
     jd_identity = re.sub(r"\s+", " ", job_description).casefold()
     candidates: list[tuple[date, Path, str]] = []
@@ -179,7 +179,7 @@ def _find_cached_resume(
             saved_date = date.fromisoformat(match.group(1))
         except ValueError:
             continue
-        if not (run_date - timedelta(days=7) <= saved_date <= run_date):
+        if not (run_date - timedelta(days=2) <= saved_date <= run_date):
             continue
         company, role = match.group(2).strip(), match.group(3).strip()
         if company and role and company.casefold() in jd_identity and role.casefold() in jd_identity:

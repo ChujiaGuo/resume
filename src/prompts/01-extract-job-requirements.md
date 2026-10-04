@@ -29,7 +29,7 @@ Return this exact JSON shape:
   "notes": []
 }
 
-Use sequential IDs within each list. Use an empty array when there are no requirements in a category or list. Put material ambiguities or internally conflicting statements in `notes`; do not resolve them by guessing. Ensure the result parses as strict JSON: use double-quoted strings, escape embedded quotes, and do not add trailing commas.
+Use sequential IDs within each list. Use an empty array when there are no requirements in a category or list. Put material ambiguities or internally conflicting statements in `notes`; do not resolve them by guessing. Ensure the result parses as strict JSON: use double-quoted strings, escape embedded quotes, and do not add trailing commas. Keep role to a minimum, do not include dates or times in the role field.
 
 JOB DESCRIPTION:
 {{JOB_DESCRIPTION}}
